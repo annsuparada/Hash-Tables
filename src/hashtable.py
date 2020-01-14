@@ -51,18 +51,30 @@ class HashTable:
 
         Fill this in.
         '''
-        index = self._hash_mod(key) #compute index of key
-        self.size += 1 #increment size
+        # index = self._hash_mod(key) #compute index of key
+        # # self.size += 1 #increment size
         
-        node = self.storage[index]
-        #check if node is empty
-        if node is None:
-            self.storage[index] = LinkedPair(key, value)
-            return
+        # node = self.storage[index]
+        # #check if node is empty
+        # if node is None:
+        #     self.storage[index] = LinkedPair(key, value)
+        #     return
         
-        while node.next:
-            node = node.next
-        node.next = LinkedPair(key, value)  
+        # while node.next:
+        #     node = node.next
+        # node.next = LinkedPair(key, value)  
+        index = self._hash_mod(key)
+        current_pair = self.storage[index]
+        last_pair = None
+        while current_pair is not None and current_pair.key is not key:
+            last_pair = current_pair
+            current_pair = last_pair.next
+        if current_pair is not None:
+            current_pair.value = value
+        else:
+            new_pair = LinkedPair(key, value)
+            new_pair.next = self.storage[index]
+            self.storage[index] = new_pair
 
 
 
@@ -115,7 +127,7 @@ class HashTable:
 
         Fill this in.
         '''
-        self.capacity *= self.capacity
+        self.capacity *= 2
 
         new_storage = [None] * self.capacity
         copy = self.storage
@@ -126,6 +138,7 @@ class HashTable:
                 self.insert(current_pair.key, current_pair.value)
                 current_pair = current_pair.next
 
+        
 
 
 if __name__ == "__main__":
