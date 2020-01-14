@@ -15,16 +15,16 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
-
+        self.size = 0
 
     def _hash(self, key):
         '''
         Hash an arbitrary key and return an integer.
 
         You may replace the Python hash with DJB2 as a stretch goal.
+
         '''
         return hash(key)
-
 
     def _hash_djb2(self, key):
         '''
@@ -51,7 +51,18 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key) #compute index of key
+        self.size += 1 #increment size
+        
+        node = self.storage[index]
+        #check if node is empty
+        if node is None:
+            self.storage[index] = LinkedPair(key, value)
+            return
+        
+        while node.next:
+            node = node.next
+        node.next = LinkedPair(key, value)  
 
 
 
@@ -63,7 +74,20 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        if self.storage[index] is None:
+            #Print a warning if the key is not found.
+            print(f'Error, key is not found in index {index}')
+            return
+        
+        pair = self.storage[index]
+        searching = True
+        while pair is not None and searching is True:
+            if pair.key == key:
+                self.storage[index] = None
+                searching = False
+            else:
+                pair = pair.next
 
 
     def retrieve(self, key):
@@ -74,7 +98,14 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        node = self.storage[index]
+        while node is not None:
+            if node.key == key:
+                return node.value
+            node = node.next
+
+        return None  
 
 
     def resize(self):
@@ -84,7 +115,16 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        self.capacity *= self.capacity
+
+        new_storage = [None] * self.capacity
+        copy = self.storage
+        self.storage = new_storage
+        for pair in copy:
+            current_pair = pair
+            while current_pair is not None:
+                self.insert(current_pair.key, current_pair.value)
+                current_pair = current_pair.next
 
 
 
@@ -96,7 +136,6 @@ if __name__ == "__main__":
     ht.insert("line_3", "Linked list saves the day!")
 
     print("")
-
     # Test storing beyond capacity
     print(ht.retrieve("line_1"))
     print(ht.retrieve("line_2"))
@@ -115,3 +154,5 @@ if __name__ == "__main__":
     print(ht.retrieve("line_3"))
 
     print("")
+
+
